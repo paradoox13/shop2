@@ -1,0 +1,72 @@
+# ============================================================
+#  آوال سیم | .htaccess (public_html)
+#  سازگار با DirectAdmin / Apache 2.4 / PHP-FPM و PHP-CGI
+# ============================================================
+
+Options -Indexes -MultiViews
+DirectoryIndex index.php
+AddDefaultCharset UTF-8
+
+# ---------- اجبار HTTPS ----------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # فایل‌ها و پوشه‌های واقعی مستقیم سرو می‌شوند
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # بقیه درخواست‌ها به Front Controller
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# ---------- هدرهای امنیتی ----------
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+    # CSP: CDNهای Tailwind / Alpine / فونت مجاز هستند، فراخوانی درگاه نه (Redirect است)
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' data: https://cdn.jsdelivr.net https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+</IfModule>
+
+# ---------- بلاک فایل‌های حساس ----------
+<FilesMatch "(^\.|\.env|\.git|\.htaccess|\.htpasswd|composer\.(json|lock)|package(-lock)?\.json|\.sql$|\.log$|\.bak$|\.old$|\.sh$|\.ini$|\.md$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# ---------- جلوگیری از اجرای PHP در پوشه آپلود ----------
+# این کار در public_html/assets/uploads/.htaccess انجام می‌شود؛ هرگز AddType سراسری
+# برای .php در ریشه قرار ندهید چون ممکن است اجرای برنامه را مختل کند.
+
+# ---------- کش استاتیک ----------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+    ExpiresByType text/css "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType font/woff2 "access plus 90 days"
+</IfModule>
+
+# ---------- فشرده‌سازی ----------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+# ---------- صفحه خطای پیش‌فرض (در صورت خطای وب‌سرور) ----------
+ErrorDocument 403 /index.php
+ErrorDocument 404 /index.php

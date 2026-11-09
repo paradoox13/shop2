@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /admin
+Disallow: /reseller
+Disallow: /cart
+Disallow: /checkout
+Disallow: /payment
+Disallow: /login
+Disallow: /register
+Allow: /
+
+Sitemap: https://avvalsim.ir/sitemap.xml

@@ -1,0 +1,107 @@
+-- ============================================================
+--  آوال سیم | داده‌های اولیه (idempotent)
+--  این فایل بعد از migrations.sql اجرا می‌شود.
+--  رمز اولیه ادمین در seeds فقط برای نصب دستی است؛ نصب از طریق
+--  run_migration.php یک رمز تصادفی جدید می‌سازد و نمایش می‌دهد.
+-- ============================================================
+
+SET NAMES utf8mb4;
+
+INSERT IGNORE INTO `roles` (`name`, `title`) VALUES
+    ('super_admin', 'مدیر کل'),
+    ('admin', 'ادمین'),
+    ('reseller', 'نماینده'),
+    ('customer', 'مشتری');
+
+INSERT IGNORE INTO `permissions` (`name`, `title`) VALUES
+    ('dashboard.view', 'مشاهده داشبورد مدیریت'),
+    ('numbers.manage', 'مدیریت شماره سیم‌کارت‌ها'),
+    ('modems.manage', 'مدیریت مودم‌ها'),
+    ('activation.manage', 'مدیریت کد فعال‌سازی'),
+    ('orders.view', 'مشاهده سفارش‌ها'),
+    ('orders.manage', 'مدیریت سفارش‌ها'),
+    ('resellers.manage', 'مدیریت نمایندگان'),
+    ('reports.view', 'مشاهده گزارش‌ها'),
+    ('sms.view', 'مشاهده لاگ پیامک'),
+    ('sms.manage', 'مدیریت و ارسال مجدد پیامک'),
+    ('settings.manage', 'مدیریت تنظیمات سایت و درگاه'),
+    ('audit.view', 'مشاهده لاگ عملیات'),
+    ('users.manage', 'مدیریت کاربران و نقش‌ها (فقط مدیر کل)'),
+    ('reseller.panel', 'دسترسی به پنل نماینده'),
+    ('catalog.view', 'مشاهده کاتالوگ برای نمایندگان');
+
+INSERT IGNORE INTO `role_permissions` (`role_name`, `permission_name`) VALUES
+    ('admin', 'dashboard.view'),
+    ('admin', 'numbers.manage'),
+    ('admin', 'modems.manage'),
+    ('admin', 'activation.manage'),
+    ('admin', 'orders.view'),
+    ('admin', 'orders.manage'),
+    ('admin', 'resellers.manage'),
+    ('admin', 'reports.view'),
+    ('admin', 'sms.view'),
+    ('admin', 'sms.manage'),
+    ('admin', 'settings.manage'),
+    ('admin', 'audit.view'),
+    ('admin', 'reseller.panel'),
+    ('admin', 'catalog.view'),
+    ('super_admin', 'dashboard.view'),
+    ('super_admin', 'numbers.manage'),
+    ('super_admin', 'modems.manage'),
+    ('super_admin', 'activation.manage'),
+    ('super_admin', 'orders.view'),
+    ('super_admin', 'orders.manage'),
+    ('super_admin', 'resellers.manage'),
+    ('super_admin', 'reports.view'),
+    ('super_admin', 'sms.view'),
+    ('super_admin', 'sms.manage'),
+    ('super_admin', 'settings.manage'),
+    ('super_admin', 'audit.view'),
+    ('super_admin', 'users.manage'),
+    ('super_admin', 'reseller.panel'),
+    ('super_admin', 'catalog.view'),
+    ('reseller', 'reseller.panel'),
+    ('reseller', 'catalog.view');
+
+-- ------------------------- اپراتورها -------------------------
+INSERT IGNORE INTO `operators` (`id`, `name`, `slug`, `prefix_patterns`, `sort_order`) VALUES
+    (1, 'همراه اول', 'mci', '["0910","0911","0912","0913","0914","0915","0916","0917","0918","0919","0990","0991","0992","0993","0994"]', 1),
+    (2, 'ایرانسل', 'irancell', '["0930","0933","0935","0936","0937","0938","0939","0901","0902","0903","0905","0941"]', 2),
+    (3, 'رایتل', 'rightel', '["0920","0921","0922"]', 3),
+    (4, 'سایر اپراتورها', 'other', '[]', 9);
+
+INSERT IGNORE INTO `activation_code_prices` (`operator_id`, `price`) VALUES
+    (1, 0), (2, 0), (3, 0), (4, 0);
+
+-- ------------------------- ادمین اولیه (فقط نصب دستی) -------------------------
+-- رمز: Admin@12345  (بعد از نصب حتماً تغییر دهید)
+INSERT IGNORE INTO `users` (`username`, `password_hash`, `role`, `full_name`, `status`) VALUES
+    ('admin', '$2y$12$syPuIGGTYPztfdNG5qnk0umN8cwz0QnAoqQDrt9pvpVkSC1j3u.7a', 'super_admin', 'مدیر کل فروشگاه', 'active');
+
+-- ------------------------- تنظیمات پیش‌فرض -------------------------
+INSERT IGNORE INTO `settings` (`key`, `value`) VALUES
+    ('site_name', 'آوال سیم'),
+    ('site_tagline', 'سیم‌کارت، مودم و کد فعال‌سازی؛ مطمئن و سریع'),
+    ('site_description', 'فروشگاه اینترنتی آوال سیم؛ خرید شماره سیم‌کارت اعتباری همراه اول، ایرانسل و رایتل، مودم و کد فعال‌سازی با ضمانت و پشتیبانی.'),
+    ('support_phone', '02100000000'),
+    ('support_email', 'info@avvalsim.ir'),
+    ('address', 'تهران، خیابان ولیعصر، پلاک ۱'),
+    ('instagram', 'https://instagram.com/avvalsim'),
+    ('telegram', 'https://t.me/avvalsim'),
+    ('whatsapp', ''),
+    ('footer_about', 'آوال سیم با تمرکز بر شفافیت قیمت و تحویل سریع، خرید شماره سیم‌کارت و محصولات مرتبط را ساده کرده است.'),
+    ('payment_driver', ''),
+    ('payment_sandbox', '0'),
+    ('sms_provider', ''),
+    ('notify_phone', ''),
+    ('commission_default', '10'),
+    ('order_note', 'پس از پرداخت، شماره سیم‌کارت در پنل سفارشات شما ثبت و از طریق پیامک اطلاع‌رسانی می‌شود. کد فعال‌سازی به‌صورت فیزیکی ارسال خواهد شد.'),
+    ('about_title', 'درباره آوال سیم'),
+    ('page_about', '<p>آوال سیم فروشگاه تخصصی شماره سیم‌کارت، مودم و کد فعال‌سازی است. هدف ما ارائه قیمت شفاف، تحویل سریع و پشتیبانی واقعی است.</p><p>تمام شماره‌ها پیش از انتشار بررسی می‌شوند و وضعیت آن‌ها در لحظه به‌روزرسانی می‌شود. برای خرید عمده یا همکاری به عنوان نماینده با ما تماس بگیرید.</p>'),
+    ('terms_title', 'قوانین و مقررات'),
+    ('page_terms', '<p>با ثبت سفارش در آوال سیم، قوانین زیر را می‌پذیرید:</p><ul><li>قیمت‌ها به تومان و شامل هزینه ارسال کد فعال‌سازی نیست مگر در توضیحات محصول ذکر شود.</li><li>شماره سیم‌کارت پس از پرداخت موفق فروخته‌شده تلقی می‌شود و امکان بازگشت آن وجود ندارد.</li><li>در صورت خطای درگاه و کسر وجه، مبلغ طی ۷۲ ساعت کاری بازگردانده می‌شود.</li><li>ارسال کد فعال‌سازی به‌صورت فیزیکی و با پست انجام می‌شود.</li></ul>'),
+    ('privacy_title', 'حریم خصوصی'),
+    ('page_privacy', '<p>اطلاعاتی که هنگام خرید ثبت می‌کنید (نام، شماره تماس و ایمیل) فقط برای پردازش سفارش، پشتیبانی و اطلاع‌رسانی استفاده می‌شود.</p><p>اطلاعات پرداخت در درگاه بانکی طرف قرارداد پردازش می‌شود و آوال سیم به اطلاعات کارت شما دسترسی ندارد. داده‌ها در سرورهای داخلی نگهداری و بدون حکم قانونی به اشخاص ثالث ارائه نمی‌شوند.</p>'),
+    ('faq_title', 'سوالات متداول'),
+    ('page_faq', '<h3>شماره سیم‌کارت چگونه به من تحویل داده می‌شود؟</h3><p>پس از پرداخت، اطلاعات شماره در صفحه سفارش و پیامک نمایش داده می‌شود و مالکیت سیم‌کارت به نام شما ثبت می‌گردد.</p><h3>آیا شماره‌ها قابل استعلام هستند؟</h3><p>بله؛ پیش از خرید می‌توانید با پشتیبانی تماس بگیرید و وضعیت شماره را استعلام کنید.</p><h3>کد فعال‌سازی چطور ارسال می‌شود؟</h3><p>کد فعال‌سازی به دلیل ماهیت فیزیکی، پس از خرید و تأیید ادمین با پست ارسال می‌شود.</p><h3>اگر پرداخت انجام شود ولی سفارش ثبت نشود چه می‌شود؟</h3><p>سیستم به‌صورت خودکار هر ۱۰ دقیقه پرداخت‌های معلق را بررسی می‌کند. در صورت نیاز با پشتیبانی تماس بگیرید.</p>'),
+    ('installed_at', '');
