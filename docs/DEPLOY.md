@@ -78,6 +78,70 @@
 
 > پوشه‌های `app`, `config`, `storage`, `database`, `tests`, `docs` هرگز نباید داخل وب‌ریشه باشند. فایل `run_migration.php` و `dev_router.php` هم پس از نصب باید حذف شوند.
 
+### استقرار روی Addon Domain
+
+اگر سایت را روی یک **دامنه اضافه (Addon Domain)** بالا می‌آورید، قبل از آپلود، DocumentRoot واقعی آن را در `Domain Setup` ببینید. مسیر رایج آن:
+
+```text
+/home/USER/domains/ADDON-DOMAIN/public_html
+```
+
+#### حالت A — ساختار پیشنهادی (همان ساختار پروژه)
+
+کل پروژه (به‌جز فایل‌های توسعه) را در ریشه دامنه اضافه قرار دهید:
+
+```text
+/home/USER/domains/ADDON-DOMAIN/
+├── app/ config/ cron/ database/ lib/ storage/ views/
+└── public_html/
+```
+
+محتوای `public_html` پروژه باید مستقیماً داخل `public_html` دامنه باشد. فایل ZIP را **داخل** `public_html` باز نکنید؛ آن را در ریشه دامنه آپلود و استخراج کنید. اگر DirectAdmin یک فایل پیش‌فرض مثل `index.html` ساخته است، آن را حذف کنید.
+
+#### حالت B — DocumentRoot مستقل
+
+اگر DirectAdmin اجازه تغییر DocumentRoot می‌دهد، پروژه را در مسیر زیر قرار دهید:
+
+```text
+/home/USER/domains/ADDON-DOMAIN/avalsim/
+```
+
+و DocumentRoot را روی `.../avalsim/public_html` تنظیم کنید.
+
+> اگر DocumentRoot در DirectAdmin چیزی مثل `/home/USER/domains/PRIMARY/public_html/ADDON` است، برنامه را داخل آن قرار ندهید؛ چون `app`, `config` و `storage` داخل وب‌ریشه قرار می‌گیرند و قابل دانلود می‌شوند. در این حالت باید DocumentRoot مستقل بسازید یا از Subdomain با ریشه مستقل استفاده کنید.
+
+#### تنظیمات مخصوص Addon Domain
+
+- `APP_URL` را دقیقاً دامنه اضافه بگذارید، نه دامنه اصلی:
+
+```php
+'APP_URL' => 'https://ADDON-DOMAIN',
+```
+
+- آدرس Migration:
+
+```text
+https://ADDON-DOMAIN/run_migration.php?token=TOKEN
+```
+
+- آدرس Callback درگاه:
+
+```text
+https://ADDON-DOMAIN/payment/callback/zarinpal
+https://ADDON-DOMAIN/payment/callback/idpay
+https://ADDON-DOMAIN/payment/callback/nextpay
+```
+
+- مسیر Cron را با ریشه همان دامنه تنظیم کنید:
+
+```text
+/home/USER/domains/ADDON-DOMAIN/cron/run.php
+```
+
+- SSL دامنه اضافه را جداگانه صادر و **Force HTTPS** کنید.
+- اگر دامنه اضافه زیرمجموعه دامنه اصلی است، `APP_URL` و لینک‌های canonical باید همان دامنه اضافه باشند؛ مقدار اشتباه باعث Redirect یا Callback اشتباه می‌شود.
+- فایل ZIP را پس از استخراج از هاست حذف کنید.
+
 ### فایل‌هایی که نباید آپلود شوند
 
 - `dev_router.php` (فقط اجرای محلی)

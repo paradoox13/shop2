@@ -7,5 +7,3 @@ Disallow: /payment
 Disallow: /login
 Disallow: /register
 Allow: /
-
-Sitemap: https://avvalsim.ir/sitemap.xml
