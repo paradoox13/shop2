@@ -13,6 +13,20 @@ use RuntimeException;
 
 final class PhoneNumber
 {
+    public const TYPES = [
+        'round' => 'شماره رند',
+        'family' => 'شماره خانوادگی',
+        'super_round' => 'فوق رند',
+        'serial' => 'شماره سریالی',
+        'birthday' => 'تاریخ تولد',
+        'other' => 'سایر شماره‌ها',
+    ];
+
+    public const LINE_TYPES = [
+        'prepaid' => 'اعتباری',
+        'permanent' => 'دائمی',
+    ];
+
     private const SELECT_BASE = 'SELECT p.*, o.name AS operator_name, o.slug AS operator_slug,
             COALESCE(rp.display_name, u.username) AS reseller_name
         FROM phone_numbers p
@@ -104,6 +118,8 @@ final class PhoneNumber
         }
 
         $birthDate = self::normalizeDate($data['birth_date'] ?? null);
+        $numberType = self::normalizeType($data['number_type'] ?? null, $birthDate);
+        $lineType = self::normalizeLineType($data['line_type'] ?? null);
         [$jy, $jm, $jd] = Jalali::parts($birthDate);
 
         try {
@@ -113,6 +129,8 @@ final class PhoneNumber
                 'price' => max(0, (int) ($data['price'] ?? 0)),
                 'status' => (string) ($data['status'] ?? 'available'),
                 'reseller_id' => isset($data['reseller_id']) && (int) $data['reseller_id'] > 0 ? (int) $data['reseller_id'] : null,
+                'number_type' => $numberType,
+                'line_type' => $lineType,
                 'birth_date' => $birthDate,
                 'birth_jy' => $birthDate !== null ? $jy : null,
                 'birth_jm' => $birthDate !== null ? $jm : null,
@@ -145,6 +163,17 @@ final class PhoneNumber
             'description' => isset($data['description']) ? mb_substr(trim((string) $data['description']), 0, 500) : $current['description'],
             'updated_at' => date('Y-m-d H:i:s'),
         ];
+
+        if (array_key_exists('number_type', $data)) {
+            $birthForType = array_key_exists('birth_date', $data)
+                ? self::normalizeDate($data['birth_date'])
+                : ($current['birth_date'] ?? null);
+            $update['number_type'] = self::normalizeType($data['number_type'], $birthForType);
+        }
+
+        if (array_key_exists('line_type', $data)) {
+            $update['line_type'] = self::normalizeLineType($data['line_type']);
+        }
 
         if (array_key_exists('number', $data)) {
             $number = self::normalizeNumber((string) $data['number']);
@@ -278,5 +307,31 @@ final class PhoneNumber
         }
 
         return Jalali::parse($value);
+    }
+
+    private static function normalizeType(mixed $value, ?string $birthDate): string
+    {
+        $type = trim((string) $value);
+
+        if ($type === '') {
+            return $birthDate !== null ? 'birthday' : 'other';
+        }
+
+        if (!array_key_exists($type, self::TYPES)) {
+            throw new RuntimeException('دسته‌بندی شماره معتبر نیست.');
+        }
+
+        if ($type === 'birthday' && $birthDate === null) {
+            throw new RuntimeException('برای دسته «تاریخ تولد»، تاریخ تولد را وارد کنید.');
+        }
+
+        return $type;
+    }
+
+    private static function normalizeLineType(mixed $value): string
+    {
+        $type = trim((string) $value);
+
+        return array_key_exists($type, self::LINE_TYPES) ? $type : 'prepaid';
     }
 }

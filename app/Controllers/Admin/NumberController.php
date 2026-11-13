@@ -58,6 +58,8 @@ final class NumberController extends Controller
                 'price' => (int) $data['price'],
                 'status' => (string) $data['status'],
                 'reseller_id' => (int) ($data['reseller_id'] ?? 0),
+                'number_type' => (string) $data['number_type'],
+                'line_type' => (string) $data['line_type'],
                 'birth_date' => $data['birth_date'] ? Jalali::parse((string) $data['birth_date']) : null,
                 'description' => (string) ($data['description'] ?? ''),
             ]);
@@ -108,6 +110,8 @@ final class NumberController extends Controller
                 'price' => (int) $data['price'],
                 'status' => (string) $data['status'],
                 'reseller_id' => (int) ($data['reseller_id'] ?? 0),
+                'number_type' => (string) $data['number_type'],
+                'line_type' => (string) $data['line_type'],
                 'birth_date' => (string) ($data['birth_date'] ?? ''),
                 'description' => (string) ($data['description'] ?? ''),
             ]);
@@ -154,6 +158,8 @@ final class NumberController extends Controller
             'price' => 'required|integer|min:1000',
             'status' => 'required|in:available,reserved,sold,hidden',
             'reseller_id' => 'nullable|integer|exists:users,id',
+            'number_type' => 'required|in:round,family,super_round,serial,birthday,other',
+            'line_type' => 'required|in:prepaid,permanent',
             'birth_date' => 'nullable|jalali_date',
             'description' => 'nullable|max:500',
         ], [
@@ -162,6 +168,8 @@ final class NumberController extends Controller
             'price' => 'قیمت',
             'status' => 'وضعیت',
             'reseller_id' => 'نماینده',
+            'number_type' => 'دسته‌بندی شماره',
+            'line_type' => 'نوع خط',
             'birth_date' => 'تاریخ تولد',
             'description' => 'توضیحات',
         ]);

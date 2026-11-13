@@ -1,5 +1,5 @@
 <?php
-$input = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100 dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-teal-900';
+$input = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-teal-900';
 ?>
 <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7 dark:border-slate-800 dark:bg-slate-900">
     <h1 class="text-xl font-extrabold"><?= e($heading) ?></h1>
@@ -9,11 +9,11 @@ $input = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 te
         <?= csrf_field() ?>
         <input type="hidden" name="next" value="<?= e($next ?? '') ?>">
         <div>
-            <label for="username" class="text-xs font-medium">نام کاربری</label>
+            <label for="username" class="text-xs font-medium text-slate-700 dark:text-slate-200">نام کاربری</label>
             <input id="username" name="username" required autocomplete="username" value="<?= e(old('username')) ?>" class="<?= $input ?> ltr" autofocus>
         </div>
         <div>
-            <label for="password" class="text-xs font-medium">رمز عبور</label>
+            <label for="password" class="text-xs font-medium text-slate-700 dark:text-slate-200">رمز عبور</label>
             <input id="password" name="password" type="password" required autocomplete="current-password" class="<?= $input ?> ltr">
         </div>
         <button type="submit" class="w-full rounded-xl bg-teal-600 py-3 text-sm font-bold text-white hover:bg-teal-700">ورود</button>

@@ -10,7 +10,7 @@ $birth = !empty($number['birth_date']) ? jalali_date((string) $number['birth_dat
 <div class="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
     <section class="rounded-3xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
         <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800 dark:bg-teal-950 dark:text-teal-300"><?= e($number['operator_name']) ?></span>
+            <span class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800 dark:bg-teal-950 dark:text-teal-300"><img src="<?= e(operator_logo((string) ($number['operator_slug'] ?? ''))) ?>" alt="" class="h-5 w-5 rounded object-contain"><?= e($number['operator_name']) ?></span>
             <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">موجود</span>
         </div>
         <div class="my-6 rounded-2xl bg-gradient-to-l from-slate-50 to-teal-50/60 py-8 text-center dark:from-slate-800 dark:to-teal-950/40">
@@ -21,6 +21,14 @@ $birth = !empty($number['birth_date']) ? jalali_date((string) $number['birth_dat
             <div class="rounded-xl border border-slate-100 p-3 dark:border-slate-800">
                 <dt class="text-[11px] text-slate-400">اپراتور</dt>
                 <dd class="mt-1 font-bold"><?= e($number['operator_name']) ?></dd>
+            </div>
+            <div class="rounded-xl border border-slate-100 p-3 dark:border-slate-800">
+                <dt class="text-[11px] text-slate-400">دسته‌بندی</dt>
+                <dd class="mt-1"><span class="rounded-full px-2 py-1 text-[10px] font-bold <?= e(number_type_badge_class((string) ($number['number_type'] ?? 'other'))) ?>"><?= e(number_type_label((string) ($number['number_type'] ?? 'other'))) ?></span></dd>
+            </div>
+            <div class="rounded-xl border border-slate-100 p-3 dark:border-slate-800">
+                <dt class="text-[11px] text-slate-400">نوع خط</dt>
+                <dd class="mt-1 font-bold"><?= e(line_type_label((string) ($number['line_type'] ?? 'prepaid'))) ?></dd>
             </div>
             <div class="rounded-xl border border-slate-100 p-3 dark:border-slate-800">
                 <dt class="text-[11px] text-slate-400">تاریخ تولد ثبت‌شده</dt>

@@ -1,5 +1,5 @@
 <?php
-$input = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100 dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-teal-900';
+$input = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-teal-900';
 ?>
 <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7 dark:border-slate-800 dark:bg-slate-900">
     <h1 class="text-xl font-extrabold">ساخت حساب کاربری</h1>
@@ -8,33 +8,33 @@ $input = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 te
     <form method="post" action="<?= e(url('/register')) ?>" class="mt-5 space-y-4">
         <?= csrf_field() ?>
         <div>
-            <label for="full_name" class="text-xs font-medium">نام و نام خانوادگی *</label>
+            <label for="full_name" class="text-xs font-medium text-slate-700 dark:text-slate-200">نام و نام خانوادگی *</label>
             <input id="full_name" name="full_name" required autocomplete="name" value="<?= e(old('full_name')) ?>" class="<?= $input ?>">
             <?php if (error('full_name')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('full_name')) ?></p><?php endif; ?>
         </div>
         <div class="grid gap-4 sm:grid-cols-2">
             <div>
-                <label for="username" class="text-xs font-medium">نام کاربری *</label>
+                <label for="username" class="text-xs font-medium text-slate-700 dark:text-slate-200">نام کاربری *</label>
                 <input id="username" name="username" required autocomplete="username" value="<?= e(old('username')) ?>" class="<?= $input ?> ltr" placeholder="letters_numbers">
                 <?php if (error('username')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('username')) ?></p><?php endif; ?>
             </div>
             <div>
-                <label for="phone" class="text-xs font-medium">شماره موبایل *</label>
+                <label for="phone" class="text-xs font-medium text-slate-700 dark:text-slate-200">شماره موبایل *</label>
                 <input id="phone" name="phone" required inputmode="tel" autocomplete="tel" value="<?= e(old('phone')) ?>" class="<?= $input ?> ltr" placeholder="09121234567">
                 <?php if (error('phone')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('phone')) ?></p><?php endif; ?>
             </div>
             <div class="sm:col-span-2">
-                <label for="email" class="text-xs font-medium">ایمیل (اختیاری)</label>
+                <label for="email" class="text-xs font-medium text-slate-700 dark:text-slate-200">ایمیل (اختیاری)</label>
                 <input id="email" name="email" type="email" autocomplete="email" value="<?= e(old('email')) ?>" class="<?= $input ?> ltr">
                 <?php if (error('email')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('email')) ?></p><?php endif; ?>
             </div>
             <div>
-                <label for="password" class="text-xs font-medium">رمز عبور *</label>
+                <label for="password" class="text-xs font-medium text-slate-700 dark:text-slate-200">رمز عبور *</label>
                 <input id="password" name="password" type="password" required autocomplete="new-password" class="<?= $input ?> ltr">
                 <?php if (error('password')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('password')) ?></p><?php endif; ?>
             </div>
             <div>
-                <label for="password_confirmation" class="text-xs font-medium">تکرار رمز *</label>
+                <label for="password_confirmation" class="text-xs font-medium text-slate-700 dark:text-slate-200">تکرار رمز *</label>
                 <input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password" class="<?= $input ?> ltr">
             </div>
         </div>

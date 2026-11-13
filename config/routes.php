@@ -89,6 +89,12 @@ $router->group(['prefix' => '/reseller', 'middleware' => [ResellerMiddleware::cl
 $router->group(['prefix' => '/admin', 'middleware' => [AdminMiddleware::class]], function (Router $router): void {
     $router->get('/', [\App\Controllers\Admin\DashboardController::class, 'index']);
 
+    $router->get('/import', [\App\Controllers\Admin\ImportController::class, 'index']);
+    $router->post('/import/upload', [\App\Controllers\Admin\ImportController::class, 'upload']);
+    $router->get('/import/template/{type}', [\App\Controllers\Admin\ImportController::class, 'template']);
+    $router->get('/import/{id}', [\App\Controllers\Admin\ImportController::class, 'show']);
+    $router->post('/import/{id}/process', [\App\Controllers\Admin\ImportController::class, 'process']);
+
     $router->get('/numbers', [\App\Controllers\Admin\NumberController::class, 'index']);
     $router->get('/numbers/create', [\App\Controllers\Admin\NumberController::class, 'create']);
     $router->post('/numbers/store', [\App\Controllers\Admin\NumberController::class, 'store']);
@@ -105,6 +111,7 @@ $router->group(['prefix' => '/admin', 'middleware' => [AdminMiddleware::class]],
 
     $router->get('/activation', [\App\Controllers\Admin\ActivationController::class, 'index']);
     $router->post('/activation', [\App\Controllers\Admin\ActivationController::class, 'update']);
+    $router->post('/activation/operators', [\App\Controllers\Admin\ActivationController::class, 'storeOperator']);
 
     $router->get('/orders', [\App\Controllers\Admin\OrderController::class, 'index']);
     $router->get('/orders/export', [\App\Controllers\Admin\OrderController::class, 'export']);

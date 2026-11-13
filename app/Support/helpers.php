@@ -59,10 +59,10 @@ if (!function_exists('asset')) {
     function asset(string $path): string
     {
         $relative = ltrim($path, '/');
-        $file = (string) config('paths.public', BASE_PATH . '/public_html') . '/' . $relative;
+        $file = (string) config('paths.public', BASE_PATH . '/public_html') . '/assets/' . $relative;
         $version = is_file($file) ? '?v=' . filemtime($file) : '';
 
-        return url('/' . $relative) . $version;
+        return url('/assets/' . $relative) . $version;
     }
 }
 
@@ -396,5 +396,66 @@ if (!function_exists('safe_json')) {
     function safe_json(mixed $value): string
     {
         return (string) json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+}
+
+if (!function_exists('number_type_label')) {
+    function number_type_label(string $type): string
+    {
+        return match ($type) {
+            'round' => 'شماره رند',
+            'family' => 'شماره خانوادگی',
+            'super_round' => 'فوق رند',
+            'serial' => 'شماره سریالی',
+            'birthday' => 'تاریخ تولد',
+            default => 'سایر شماره‌ها',
+        };
+    }
+}
+
+if (!function_exists('number_type_badge_class')) {
+    function number_type_badge_class(string $type): string
+    {
+        return match ($type) {
+            'round' => 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300',
+            'family' => 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300',
+            'super_round' => 'bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-950/60 dark:text-fuchsia-300',
+            'serial' => 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300',
+            'birthday' => 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300',
+            default => 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
+        };
+    }
+}
+
+if (!function_exists('line_type_label')) {
+    function line_type_label(string $type): string
+    {
+        return $type === 'permanent' ? 'دائمی' : 'اعتباری';
+    }
+}
+
+if (!function_exists('operator_color')) {
+    function operator_color(?string $slug): string
+    {
+        return match ((string) $slug) {
+            'mci' => '#0ea5e9',
+            'irancell' => '#f5b700',
+            'rightel' => '#8b5cf6',
+            default => '#64748b',
+        };
+    }
+}
+
+if (!function_exists('operator_logo')) {
+    function operator_logo(?string $slug): string
+    {
+        $slug = (string) preg_replace('/[^a-z0-9_-]/', '', strtolower((string) $slug));
+        $allowed = ['mci', 'irancell', 'rightel', 'other'];
+
+        if (!in_array($slug, $allowed, true)) {
+            $slug = 'other';
+        }
+
+        return asset('img/operators/' . $slug . '.svg');
     }
 }

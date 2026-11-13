@@ -2,7 +2,10 @@
 $f = $filters ?? [];
 $field = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100 dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-teal-900';
 $label = 'mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400';
-$hasAdvanced = !empty($f['birth_date']) || !empty($f['birth_from']) || !empty($f['birth_to']) || !empty($f['birth_match']) || !empty($f['birth_digits']) || !empty($f['has_birth']);
+$categories = \App\Models\PhoneNumber::TYPES;
+unset($categories['other']);
+$currentType = (string) ($f['number_type'] ?? '');
+$currentLine = (string) ($f['line_type'] ?? '');
 ?>
 
 <section class="relative overflow-hidden rounded-3xl bg-gradient-to-bl from-brand-900 via-teal-800 to-emerald-700 px-6 py-10 text-white shadow-xl shadow-teal-900/20 sm:px-10">
@@ -12,7 +15,7 @@ $hasAdvanced = !empty($f['birth_date']) || !empty($f['birth_from']) || !empty($f
         <div>
             <span class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs backdrop-blur">✔ ضمانت بازگشت وجه در صورت خطای درگاه</span>
             <h1 class="mt-4 text-2xl font-extrabold leading-tight sm:text-3xl lg:text-4xl"><?= e(setting('site_tagline', 'سیم‌کارت، مودم و کد فعال‌سازی؛ مطمئن و سریع')) ?></h1>
-            <p class="mt-3 max-w-xl text-sm leading-7 text-teal-50/90">شماره‌های همراه اول، ایرانسل و رایتل با تاریخ تولد و الگوهای رند؛ تحویل فوری پس از پرداخت و پشتیبانی واقعی.</p>
+            <p class="mt-3 max-w-xl text-sm leading-7 text-teal-50/90">شماره‌های همراه اول، ایرانسل و رایتل در دسته‌های رند، خانوادگی، فوق رند، سریالی و تاریخ تولد؛ تحویل فوری پس از پرداخت و پشتیبانی واقعی.</p>
             <div class="mt-5 flex flex-wrap gap-2">
                 <a href="#numbers" class="rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-teal-900 shadow-sm transition hover:bg-teal-50">مشاهده شماره‌ها</a>
                 <a href="#activation" class="rounded-xl border border-white/40 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/10">خرید کد فعال‌سازی</a>
@@ -35,7 +38,7 @@ $hasAdvanced = !empty($f['birth_date']) || !empty($f['birth_from']) || !empty($f
     </div>
 </section>
 
-<section id="numbers" class="mt-8 scroll-mt-24" x-data="{ advanced: <?= $hasAdvanced ? 'true' : 'false' ?> }">
+<section id="numbers" class="mt-8 scroll-mt-24">
     <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
             <h2 class="text-xl font-extrabold">خرید شماره سیم‌کارت</h2>
@@ -44,7 +47,30 @@ $hasAdvanced = !empty($f['birth_date']) || !empty($f['birth_from']) || !empty($f
         <a href="<?= e(url('/')) ?>" class="text-xs font-medium text-teal-700 hover:underline dark:text-teal-300">پاک کردن فیلترها</a>
     </div>
 
-    <form method="get" action="<?= e(url('/')) ?>" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
+        <a href="<?= e(query_url('/', ['number_type' => null, 'page' => null])) ?>" class="rounded-2xl border p-3 text-center transition <?= $currentType === '' ? 'border-teal-500 bg-teal-50 shadow-sm dark:border-teal-500 dark:bg-teal-950/30' : 'border-slate-200 bg-white hover:border-teal-300 dark:border-slate-800 dark:bg-slate-900' ?>">
+            <span class="block text-lg" aria-hidden="true">▦</span><span class="mt-1 block text-xs font-bold">همه شماره‌ها</span>
+        </a>
+        <?php foreach ($categories as $type => $typeLabel): ?>
+            <a href="<?= e(query_url('/', ['number_type' => $type, 'page' => null])) ?>" class="rounded-2xl border p-3 text-center transition <?= $currentType === $type ? 'border-teal-500 bg-teal-50 shadow-sm dark:border-teal-500 dark:bg-teal-950/30' : 'border-slate-200 bg-white hover:border-teal-300 dark:border-slate-800 dark:bg-slate-900' ?>">
+                <span class="block text-lg" aria-hidden="true"><?= match ($type) { 'round' => '◉', 'family' => '👨‍👩‍👧', 'super_round' => '✦', 'serial' => '↗', 'birthday' => '🎂', default => '#' } ?></span>
+                <span class="mt-1 block text-xs font-bold"><?= e($typeLabel) ?></span>
+            </a>
+        <?php endforeach; ?>
+    </div>
+
+    <div class="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-3 text-xs dark:border-slate-800 dark:bg-slate-900">
+        <span class="text-slate-400">نوع خط:</span>
+        <a href="<?= e(query_url('/', ['line_type' => null, 'page' => null])) ?>" class="rounded-full px-3 py-1.5 font-bold <?= $currentLine === '' ? 'bg-slate-800 text-white dark:bg-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-teal-50 dark:bg-slate-800 dark:text-slate-300' ?>">همه</a>
+        <?php foreach (\App\Models\PhoneNumber::LINE_TYPES as $lineKey => $lineLabel): ?>
+            <a href="<?= e(query_url('/', ['line_type' => $lineKey, 'page' => null])) ?>" class="rounded-full px-3 py-1.5 font-bold <?= $currentLine === $lineKey ? 'bg-slate-800 text-white dark:bg-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-teal-50 dark:bg-slate-800 dark:text-slate-300' ?>"><?= e($lineLabel) ?></a>
+        <?php endforeach; ?>
+        <?php if ($currentType !== ''): ?><span class="mr-auto text-[11px] text-teal-700 dark:text-teal-300">دسته: <?= e($categories[$currentType] ?? number_type_label($currentType)) ?></span><?php endif; ?>
+    </div>
+
+    <form method="get" action="<?= e(url('/')) ?>" class="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <input type="hidden" name="number_type" value="<?= e($currentType) ?>">
+        <input type="hidden" name="line_type" value="<?= e($currentLine) ?>">
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div>
                 <label for="q" class="<?= $label ?>">جستجوی سریع</label>
@@ -76,16 +102,6 @@ $hasAdvanced = !empty($f['birth_date']) || !empty($f['birth_from']) || !empty($f
                 <input id="suffix" name="suffix" value="<?= e($f['suffix'] ?? '') ?>" placeholder="1234" class="<?= $field ?>">
             </div>
             <div>
-                <label for="pattern" class="<?= $label ?>">الگوی عددی</label>
-                <select id="pattern" name="pattern" class="<?= $field ?>">
-                    <option value="">همه شماره‌ها</option>
-                    <option value="repeat" <?= ($f['pattern'] ?? '') === 'repeat' ? 'selected' : '' ?>>چهار رقم تکراری</option>
-                    <option value="round" <?= ($f['pattern'] ?? '') === 'round' ? 'selected' : '' ?>>رند (۴ رقم یکسان در پایان)</option>
-                    <option value="tail_repeat" <?= ($f['pattern'] ?? '') === 'tail_repeat' ? 'selected' : '' ?>>سه رقم یکسان در پایان</option>
-                    <option value="serial" <?= ($f['pattern'] ?? '') === 'serial' ? 'selected' : '' ?>>چهار رقم متوالی</option>
-                </select>
-            </div>
-            <div>
                 <label for="sort" class="<?= $label ?>">مرتب‌سازی</label>
                 <select id="sort" name="sort" class="<?= $field ?>">
                     <option value="newest" <?= ($f['sort'] ?? '') === 'newest' ? 'selected' : '' ?>>جدیدترین</option>
@@ -97,48 +113,12 @@ $hasAdvanced = !empty($f['birth_date']) || !empty($f['birth_from']) || !empty($f
         </div>
 
         <div class="mt-3 flex flex-wrap items-center gap-2">
-            <button type="button" @click="advanced = !advanced" class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium hover:border-teal-400 dark:border-slate-700">
-                <span x-text="advanced ? 'بستن فیلتر تاریخ تولد' : 'فیلتر پیشرفته تاریخ تولد'"></span>
-            </button>
             <?php if (!empty($popularPrefixes)): ?>
                 <span class="text-[11px] text-slate-400">پیش‌شماره‌های پرطرفدار:</span>
                 <?php foreach ($popularPrefixes as $prefix): ?>
                     <a href="<?= e(query_url('/', ['prefix' => $prefix, 'page' => null])) ?>" class="ltr rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-slate-600 hover:bg-teal-100 hover:text-teal-800 dark:bg-slate-800 dark:text-slate-300"><?= fa_num($prefix) ?></a>
                 <?php endforeach; ?>
             <?php endif; ?>
-        </div>
-
-        <div x-show="advanced" x-cloak class="mt-4 rounded-xl border border-teal-100 bg-teal-50/50 p-3 dark:border-teal-900 dark:bg-teal-950/20">
-            <p class="mb-3 text-xs font-bold text-teal-800 dark:text-teal-300">فیلتر تاریخ تولد (شمسی یا میلادی)</p>
-            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <div>
-                    <label for="birth_date" class="<?= $label ?>">تاریخ تولد دقیق</label>
-                    <input id="birth_date" name="birth_date" value="<?= e($f['birth_date'] ?? '') ?>" placeholder="1370/05/12" class="<?= $field ?>">
-                </div>
-                <div>
-                    <label for="birth_from" class="<?= $label ?>">از تاریخ</label>
-                    <input id="birth_from" name="birth_from" value="<?= e($f['birth_from'] ?? '') ?>" placeholder="1370/01/01" class="<?= $field ?>">
-                </div>
-                <div>
-                    <label for="birth_to" class="<?= $label ?>">تا تاریخ</label>
-                    <input id="birth_to" name="birth_to" value="<?= e($f['birth_to'] ?? '') ?>" placeholder="1370/12/29" class="<?= $field ?>">
-                </div>
-                <div>
-                    <label for="birth_digits" class="<?= $label ?>">ارقام تاریخ در شماره</label>
-                    <input id="birth_digits" name="birth_digits" value="<?= e($f['birth_digits'] ?? '') ?>" placeholder="مثلاً 700512" class="<?= $field ?>">
-                </div>
-            </div>
-            <div class="mt-3 flex flex-wrap gap-4 text-xs">
-                <label class="inline-flex items-center gap-2">
-                    <input type="checkbox" name="has_birth" value="1" <?= !empty($f['has_birth']) ? 'checked' : '' ?> class="rounded border-slate-300 text-teal-600 focus:ring-teal-500">
-                    فقط شماره‌های دارای تاریخ تولد
-                </label>
-                <label class="inline-flex items-center gap-2">
-                    <input type="checkbox" name="birth_match" value="1" <?= !empty($f['birth_match']) ? 'checked' : '' ?> class="rounded border-slate-300 text-teal-600 focus:ring-teal-500">
-                    ارقام تاریخ تولد در شماره تکرار شده باشد
-                </label>
-            </div>
-            <p class="mt-2 text-[11px] leading-5 text-slate-500 dark:text-slate-400">نمونه: با انتخاب تاریخ 1370/05/12 و تیک تطابق، شماره‌هایی نمایش داده می‌شوند که شامل ۱۳۷۰ یا ۷۰۰۵۱۲ باشند. برای پاک کردن سریع از لینک «پاک کردن فیلترها» استفاده کنید.</p>
         </div>
 
         <div class="mt-4 flex flex-wrap gap-2">
@@ -173,9 +153,9 @@ $hasAdvanced = !empty($f['birth_date']) || !empty($f['birth_from']) || !empty($f
     </div>
     <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <?php foreach ($activationPrices as $activation): ?>
-            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div class="flex items-center justify-between">
-                    <span class="font-bold"><?= e($activation['operator_name']) ?></span>
+            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900" style="border-top: 4px solid <?= e(operator_color((string) ($activation['slug'] ?? ''))) ?>">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="flex items-center gap-2 font-bold"><img src="<?= e(operator_logo((string) ($activation['slug'] ?? ''))) ?>" alt="" class="h-7 w-7 rounded-md object-contain"><span><?= e($activation['operator_name']) ?></span></span>
                     <span class="rounded-full bg-slate-100 px-2 py-1 text-[10px] text-slate-500 dark:bg-slate-800">کد فعال‌سازی</span>
                 </div>
                 <div class="mt-4">

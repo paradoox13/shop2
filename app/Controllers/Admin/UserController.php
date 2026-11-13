@@ -66,7 +66,7 @@ final class UserController extends Controller
                 'password' => $data['password'],
                 'full_name' => $data['full_name'],
                 'phone' => Str::normalizeMobile((string) $data['phone']),
-                'email' => $data['email'] ?: null,
+                'email' => !empty($data['email']) ? (string) $data['email'] : null,
                 'display_name' => $data['display_name'],
                 'contact' => $data['contact'] ?? null,
                 'commission_rate' => (float) $data['commission_rate'],
@@ -131,7 +131,7 @@ final class UserController extends Controller
             User::update($id, [
                 'full_name' => $data['full_name'],
                 'phone' => Str::normalizeMobile((string) $data['phone']),
-                'email' => $data['email'] ?: null,
+                'email' => !empty($data['email']) ? (string) $data['email'] : null,
                 'status' => $data['status'],
             ]);
 

@@ -24,6 +24,26 @@ $supportPhone = setting('support_phone', (string) config('app.support_phone'));
                     document.documentElement.classList.add('dark');
                 }
             } catch (e) {}
+            document.documentElement.style.colorScheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+
+            function syncIcons() {
+                var dark = document.documentElement.classList.contains('dark');
+                document.querySelectorAll('[data-theme-icon]').forEach(function (el) {
+                    el.textContent = dark ? '☀️' : '🌙';
+                });
+            }
+
+            // مستقل از app.js؛ اگر فایل استاتیک دیر بارگذاری شود دکمه باز هم کار می‌کند.
+            window.toggleTheme = function () {
+                var html = document.documentElement;
+                html.classList.toggle('dark');
+                var dark = html.classList.contains('dark');
+                html.style.colorScheme = dark ? 'dark' : 'light';
+                try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+                syncIcons();
+            };
+
+            document.addEventListener('DOMContentLoaded', syncIcons);
         })();
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -209,8 +229,13 @@ $supportPhone = setting('support_phone', (string) config('app.support_phone'));
             </div>
         </div>
     </div>
-    <div class="border-t border-slate-100 py-4 text-center text-xs text-slate-400 dark:border-slate-800">
-        © <?= fa_num(jdate('Y')) ?> <?= e($siteName) ?> — تمام حقوق محفوظ است. طراحی‌شده برای خرید مطمئن.
+    <div class="border-t border-slate-100 py-5 dark:border-slate-800">
+        <div class="flex justify-center">
+            <a referrerpolicy="origin" target="_blank" rel="noopener noreferrer" href="https://trustseal.enamad.ir/?id=335723&amp;Code=KRTmIooxMU2zusKC1mEj" title="نماد اعتماد الکترونیکی">
+                <img referrerpolicy="origin" src="https://trustseal.enamad.ir/logo.aspx?id=335723&amp;Code=KRTmIooxMU2zusKC1mEj" alt="نماد اعتماد الکترونیکی" code="KRTmIooxMU2zusKC1mEj" loading="lazy" class="h-24 w-auto">
+            </a>
+        </div>
+        <p class="mt-2 text-center text-xs text-slate-400">© <?= fa_num(jdate('Y')) ?> <?= e($siteName) ?> — تمام حقوق محفوظ است. طراحی‌شده برای خرید مطمئن.</p>
     </div>
 </footer>
 

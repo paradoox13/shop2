@@ -29,8 +29,12 @@ $label = 'block text-xs font-medium text-slate-600 dark:text-slate-300';
             </div>
             <div>
                 <label for="password" class="<?= $label ?>">رمز عبور *</label>
-                <input id="password" name="password" type="password" required class="<?= $input ?> ltr">
+                <input id="password" name="password" type="password" required autocomplete="new-password" class="<?= $input ?> ltr">
                 <?php if (error('password')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('password')) ?></p><?php endif; ?>
+            </div>
+            <div>
+                <label for="password_confirmation" class="<?= $label ?>">تکرار رمز عبور *</label>
+                <input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password" class="<?= $input ?> ltr">
             </div>
         <?php endif; ?>
 
@@ -72,7 +76,7 @@ $label = 'block text-xs font-medium text-slate-600 dark:text-slate-300';
             </div>
             <div>
                 <label for="password" class="<?= $label ?>">رمز عبور جدید (اختیاری)</label>
-                <input id="password" name="password" type="password" class="<?= $input ?> ltr" placeholder="برای عدم تغییر خالی بگذارید">
+                <input id="password" name="password" type="password" autocomplete="new-password" class="<?= $input ?> ltr" placeholder="برای عدم تغییر خالی بگذارید">
                 <?php if (error('password')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('password')) ?></p><?php endif; ?>
             </div>
             <div>

@@ -33,7 +33,7 @@ final class ImportService
      * @param array<string, mixed> $file
      * @return array{id:int, total:int}
      */
-    public function upload(int $resellerId, string $type, array $file): array
+    public function upload(?int $resellerId, string $type, array $file): array
     {
         if (!in_array($type, ['number', 'modem'], true)) {
             throw new RuntimeException('نوع ایمپورت نامعتبر است.');
@@ -90,7 +90,7 @@ final class ImportService
                 throw new RuntimeException('حداکثر ' . fa_num(self::MAX_ROWS) . ' ردیف در هر فایل مجاز است. فایل را تقسیم کنید.');
             }
 
-            $ndjson = $dir . '/' . $resellerId . '-' . $type . '-' . bin2hex(random_bytes(6)) . '.ndjson';
+            $ndjson = $dir . '/' . ($resellerId ?? 'admin') . '-' . $type . '-' . bin2hex(random_bytes(6)) . '.ndjson';
             $handle = fopen($ndjson, 'wb');
 
             if ($handle === false) {
@@ -172,6 +172,7 @@ final class ImportService
         $failed = (int) $log['failed_rows'];
         $cursor = (int) $log['cursor_offset'];
         $total = (int) $log['total_rows'];
+        $ownerId = $resellerId ?? (isset($log['reseller_id']) && $log['reseller_id'] !== null ? (int) $log['reseller_id'] : null);
 
         fseek($handle, $cursor);
         $chunkProcessed = 0;
@@ -200,7 +201,7 @@ final class ImportService
             }
 
             try {
-                $this->importRow((string) $log['type'], $row, $resellerId ?? (int) $log['reseller_id']);
+                $this->importRow((string) $log['type'], $row, $ownerId);
                 $inserted++;
             } catch (Throwable $e) {
                 $failed++;
@@ -248,11 +249,11 @@ final class ImportService
     {
         $headers = $type === 'modem'
             ? ['برند', 'مدل', 'قیمت', 'موجودی', 'توضیحات']
-            : ['شماره', 'قیمت', 'اپراتور', 'تاریخ تولد', 'توضیحات'];
+            : ['شماره', 'قیمت', 'اپراتور', 'دسته‌بندی', 'نوع خط', 'تاریخ تولد', 'توضیحات'];
 
         $sample = $type === 'modem'
             ? ['TP-Link', 'Archer MR600', '2500000', '5', 'مودم LTE با پشتیبانی سیم‌کارت']
-            : ['09121234567', '1800000', 'همراه اول', '1370/05/12', 'شماره رند'];
+            : ['09121234567', '1800000', 'همراه اول', 'round', 'prepaid', '1370/05/12', 'شماره رند'];
 
         $handle = fopen('php://temp', 'r+');
         fwrite($handle, "\xEF\xBB\xBF");
@@ -280,6 +281,8 @@ final class ImportService
                 'number' => $value('number'),
                 'price' => $value('price'),
                 'operator' => $value('operator'),
+                'number_type' => $value('number_type'),
+                'line_type' => $value('line_type'),
                 'birth_date' => $value('birth_date'),
                 'description' => $value('description'),
             ];
@@ -296,7 +299,7 @@ final class ImportService
     }
 
     /** @param array<string, mixed> $row */
-    private function importRow(string $type, array $row, int $resellerId): void
+    private function importRow(string $type, array $row, ?int $resellerId): void
     {
         if ($type === 'number') {
             $number = PhoneNumber::normalizeNumber((string) ($row['number'] ?? ''));
@@ -343,10 +346,35 @@ final class ImportService
                 throw new RuntimeException('تاریخ تولد نامعتبر است.');
             }
 
+            $numberType = trim((string) ($row['number_type'] ?? ''));
+            $lineType = trim((string) ($row['line_type'] ?? ''));
+
+            if ($numberType === '') {
+                $numberType = $birthDate !== null ? 'birthday' : 'other';
+            }
+
+            if (!array_key_exists($numberType, PhoneNumber::TYPES)) {
+                throw new RuntimeException('دسته‌بندی شماره معتبر نیست.');
+            }
+
+            if ($numberType === 'birthday' && $birthDate === null) {
+                throw new RuntimeException('برای دسته تاریخ تولد، ستون تاریخ تولد را کامل کنید.');
+            }
+
+            if ($lineType === '') {
+                $lineType = 'prepaid';
+            }
+
+            if (!array_key_exists($lineType, PhoneNumber::LINE_TYPES)) {
+                throw new RuntimeException('نوع خط باید prepaid یا permanent باشد.');
+            }
+
             PhoneNumber::create([
                 'operator_id' => $operatorId,
                 'number' => $number,
                 'price' => $price,
+                'number_type' => $numberType,
+                'line_type' => $lineType,
                 'birth_date' => $birthDate,
                 'description' => (string) ($row['description'] ?? ''),
                 'reseller_id' => $resellerId,
@@ -447,6 +475,8 @@ final class ImportService
                 'number' => ['شماره', 'شماره سیم کارت', 'شماره سیمکارت', 'number', 'phone', 'mobile'],
                 'price' => ['قیمت', 'مبلغ', 'price', 'amount'],
                 'operator' => ['اپراتور', 'عملگر', 'operator', 'network'],
+                'number_type' => ['دسته بندی', 'دسته‌بندی', 'نوع شماره', 'category', 'number type', 'number_type'],
+                'line_type' => ['نوع خط', 'دائمی یا اعتباری', 'line type', 'line_type'],
                 'birth_date' => ['تاریخ تولد', 'تولد', 'birth date', 'birthdate', 'birth_date'],
                 'description' => ['توضیحات', 'شرح', 'description', 'note'],
             ]
@@ -491,7 +521,7 @@ final class ImportService
     private function positionalMap(string $type): array
     {
         return $type === 'number'
-            ? ['number' => 0, 'price' => 1, 'operator' => 2, 'birth_date' => 3, 'description' => 4]
+            ? ['number' => 0, 'price' => 1, 'operator' => 2, 'number_type' => 3, 'line_type' => 4, 'birth_date' => 5, 'description' => 6]
             : ['brand' => 0, 'model' => 1, 'price' => 2, 'stock' => 3, 'description' => 4];
     }
 

@@ -6,6 +6,7 @@ $sections = [
     'فروش و محصولات' => [
         ['/admin', 'داشبورد', '▦', true, null],
         ['/admin/numbers', 'شماره‌ها', '📱', false, 'numbers.manage'],
+        ['/admin/import', 'ایمپورت اکسل', '📥', false, 'numbers.manage'],
         ['/admin/modems', 'مودم‌ها', '📶', false, 'modems.manage'],
         ['/admin/activation', 'کد فعال‌سازی', '🔑', false, 'activation.manage'],
     ],
@@ -38,6 +39,25 @@ $sections = [
                     document.documentElement.classList.add('dark');
                 }
             } catch (e) {}
+            document.documentElement.style.colorScheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+
+            function syncIcons() {
+                var dark = document.documentElement.classList.contains('dark');
+                document.querySelectorAll('[data-theme-icon]').forEach(function (el) {
+                    el.textContent = dark ? '☀️' : '🌙';
+                });
+            }
+
+            window.toggleTheme = function () {
+                var html = document.documentElement;
+                html.classList.toggle('dark');
+                var dark = html.classList.contains('dark');
+                html.style.colorScheme = dark ? 'dark' : 'light';
+                try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+                syncIcons();
+            };
+
+            document.addEventListener('DOMContentLoaded', syncIcons);
         })();
     </script>
     <script src="https://cdn.tailwindcss.com"></script>

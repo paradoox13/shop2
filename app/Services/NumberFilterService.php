@@ -52,6 +52,19 @@ final class NumberFilterService
             }
         }
 
+        // دسته‌بندی شماره و نوع خط
+        $numberType = trim((string) ($filters['number_type'] ?? ''));
+        if (array_key_exists($numberType, \App\Models\PhoneNumber::TYPES)) {
+            $where[] = 'p.number_type = ?';
+            $params[] = $numberType;
+        }
+
+        $lineType = trim((string) ($filters['line_type'] ?? ''));
+        if (array_key_exists($lineType, \App\Models\PhoneNumber::LINE_TYPES)) {
+            $where[] = 'p.line_type = ?';
+            $params[] = $lineType;
+        }
+
         // وضعیت (پنل نماینده/ادمین)
         if (!$publicOnly && isset($filters['status']) && $filters['status'] !== '') {
             $status = (string) $filters['status'];

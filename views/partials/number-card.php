@@ -1,10 +1,21 @@
 <?php
 /** @var array<string, mixed> $item */
 $birth = !empty($item['birth_date']) ? jalali_date((string) $item['birth_date']) : null;
+$type = (string) ($item['number_type'] ?? 'other');
+$lineType = (string) ($item['line_type'] ?? 'prepaid');
+$slug = (string) ($item['operator_slug'] ?? '');
 ?>
-<article class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-300 hover:shadow-lg hover:shadow-teal-900/5 dark:border-slate-800 dark:bg-slate-900">
-    <div class="mb-3 flex items-center justify-between gap-2">
-        <span class="inline-flex items-center rounded-full bg-teal-50 px-2.5 py-1 text-[11px] font-bold text-teal-800 dark:bg-teal-950 dark:text-teal-300"><?= e($item['operator_name']) ?></span>
+<article class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-300 hover:shadow-lg hover:shadow-teal-900/5 dark:border-slate-800 dark:bg-slate-900" style="border-top: 4px solid <?= e(operator_color($slug)) ?>">
+    <div class="mb-2 flex items-center justify-between gap-2">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+            <img src="<?= e(operator_logo($slug)) ?>" alt="" class="h-5 w-5 rounded object-contain">
+            <?= e($item['operator_name']) ?>
+        </span>
+        <span class="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"><?= e(line_type_label($lineType)) ?></span>
+    </div>
+
+    <div class="mb-3 flex flex-wrap items-center gap-1.5">
+        <span class="inline-flex items-center rounded-full px-2 py-1 text-[10px] font-bold <?= e(number_type_badge_class($type)) ?>"><?= e(number_type_label($type)) ?></span>
         <?php if ($birth !== null): ?>
             <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[10px] font-medium text-amber-800 dark:bg-amber-950/60 dark:text-amber-300" title="تاریخ تولد ثبت‌شده">
                 🎂 <?= fa_num($birth) ?>

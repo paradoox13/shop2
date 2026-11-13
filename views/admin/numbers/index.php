@@ -8,7 +8,10 @@ $input = 'w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs o
         <h2 class="text-lg font-extrabold">مدیریت شماره‌ها</h2>
         <p class="mt-1 text-xs text-slate-500"><?= fa_num($numbers['total'] ?? 0) ?> شماره در سامانه</p>
     </div>
-    <a href="<?= e(url('/admin/numbers/create')) ?>" class="rounded-xl bg-teal-600 px-4 py-2 text-xs font-bold text-white hover:bg-teal-700">+ افزودن شماره</a>
+    <div class="flex flex-wrap gap-2">
+        <a href="<?= e(url('/admin/import')) ?>" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold hover:border-teal-400 dark:border-slate-700 dark:bg-slate-900">📥 ایمپورت اکسل</a>
+        <a href="<?= e(url('/admin/numbers/create')) ?>" class="rounded-xl bg-teal-600 px-4 py-2 text-xs font-bold text-white hover:bg-teal-700">+ افزودن شماره</a>
+    </div>
 </div>
 
 <form method="get" action="<?= e(url('/admin/numbers')) ?>" class="mt-4 rounded-2xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
@@ -46,19 +49,20 @@ $input = 'w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs o
         <table class="w-full text-xs">
             <thead class="bg-slate-50 text-right text-[10px] text-slate-500 dark:bg-slate-800/50">
                 <tr>
-                    <th class="p-3">#</th><th class="p-3">شماره</th><th class="p-3">اپراتور</th><th class="p-3">قیمت</th>
+                    <th class="p-3">#</th><th class="p-3">شماره</th><th class="p-3">اپراتور</th><th class="p-3">دسته / نوع</th><th class="p-3">قیمت</th>
                     <th class="p-3">وضعیت</th><th class="p-3">نماینده</th><th class="p-3">تاریخ تولد</th><th class="p-3">ثبت</th><th class="p-3">عملیات</th>
                 </tr>
             </thead>
             <tbody>
             <?php if (($numbers['items'] ?? []) === []): ?>
-                <tr><td colspan="9" class="p-8 text-center text-slate-400">شماره‌ای با این فیلترها یافت نشد.</td></tr>
+                <tr><td colspan="10" class="p-8 text-center text-slate-400">شماره‌ای با این فیلترها یافت نشد.</td></tr>
             <?php endif; ?>
             <?php foreach ($numbers['items'] as $row): ?>
                 <tr class="border-t border-slate-100 hover:bg-slate-50/60 dark:border-slate-800 dark:hover:bg-slate-800/30">
                     <td class="p-3 text-slate-400"><?= fa_num($row['id']) ?></td>
                     <td class="ltr p-3 font-bold tracking-wider"><?= e($row['number']) ?></td>
-                    <td class="p-3"><?= e($row['operator_name']) ?></td>
+                    <td class="p-3"><span class="inline-flex items-center gap-1.5"><img src="<?= e(operator_logo((string) ($row['operator_slug'] ?? ''))) ?>" alt="" class="h-5 w-5 rounded object-contain"><?= e($row['operator_name']) ?></span></td>
+                    <td class="p-3 text-[10px]"><span class="rounded-full px-2 py-0.5 font-bold <?= e(number_type_badge_class((string) ($row['number_type'] ?? 'other'))) ?>"><?= e(number_type_label((string) ($row['number_type'] ?? 'other'))) ?></span><span class="mt-1 block text-slate-400"><?= e(line_type_label((string) ($row['line_type'] ?? 'prepaid'))) ?></span></td>
                     <td class="p-3 font-bold"><?= price($row['price']) ?></td>
                     <td class="p-3"><span class="rounded-full px-2 py-0.5 text-[9px] font-bold <?= e(status_badge_class((string) $row['status'])) ?>"><?= e(number_status_label((string) $row['status'])) ?></span></td>
                     <td class="p-3 text-[10px]"><?= e($row['reseller_name'] ?? '—') ?></td>

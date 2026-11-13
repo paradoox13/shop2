@@ -78,6 +78,8 @@ CREATE TABLE IF NOT EXISTS `phone_numbers` (
     `birth_jy` SMALLINT NULL,
     `birth_jm` TINYINT NULL,
     `birth_jd` TINYINT NULL,
+    `number_type` VARCHAR(20) NOT NULL DEFAULT 'other',
+    `line_type` VARCHAR(20) NOT NULL DEFAULT 'prepaid',
     `description` VARCHAR(500) NULL,
     `views` INT UNSIGNED NOT NULL DEFAULT 0,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -88,12 +90,15 @@ CREATE TABLE IF NOT EXISTS `phone_numbers` (
     KEY `idx_phone_status_price` (`status`, `price`),
     KEY `idx_phone_birth` (`birth_date`),
     KEY `idx_phone_birth_j` (`birth_jy`, `birth_jm`, `birth_jd`),
+    KEY `idx_phone_type` (`number_type`, `line_type`, `status`),
     KEY `idx_phone_created` (`created_at`),
     KEY `idx_phone_reseller` (`reseller_id`, `status`),
     KEY `idx_phone_status_created` (`status`, `created_at`),
     CONSTRAINT `fk_phone_operator` FOREIGN KEY (`operator_id`) REFERENCES `operators` (`id`),
     CONSTRAINT `fk_phone_reseller` FOREIGN KEY (`reseller_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
     CONSTRAINT `chk_phone_status` CHECK (`status` IN ('available', 'reserved', 'sold', 'hidden')),
+    CONSTRAINT `chk_phone_type` CHECK (`number_type` IN ('round', 'family', 'super_round', 'serial', 'birthday', 'other')),
+    CONSTRAINT `chk_phone_line_type` CHECK (`line_type` IN ('prepaid', 'permanent')),
     CONSTRAINT `chk_phone_number` CHECK (CHAR_LENGTH(`number`) = 11 AND `number` LIKE '09%')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -205,7 +210,7 @@ CREATE TABLE IF NOT EXISTS `reseller_profiles` (
 -- ------------------------- ایمپورت‌ها -------------------------
 CREATE TABLE IF NOT EXISTS `import_logs` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `reseller_id` BIGINT UNSIGNED NOT NULL,
+    `reseller_id` BIGINT UNSIGNED NULL,
     `type` VARCHAR(20) NOT NULL,
     `file_path` VARCHAR(255) NOT NULL,
     `total_rows` INT UNSIGNED NOT NULL DEFAULT 0,

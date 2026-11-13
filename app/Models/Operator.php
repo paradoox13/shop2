@@ -44,6 +44,39 @@ final class Operator
         return null;
     }
 
+    /**
+     * افزودن اپراتور جدید از پنل مدیریت.
+     * @param array<int, string> $patterns
+     */
+    public static function create(string $name, string $slug, array $patterns = [], int $sortOrder = 0): int
+    {
+        $name = trim($name);
+        $slug = strtolower(trim($slug));
+
+        if ($name === '' || preg_match('/^[a-z0-9_-]{2,60}$/', $slug) !== 1) {
+            throw new \RuntimeException('نام و شناسه اپراتور معتبر نیست.');
+        }
+
+        $cleanPatterns = array_values(array_filter(array_map(
+            static fn ($value): string => preg_replace('/\D+/', '', (string) $value) ?? '',
+            $patterns
+        )));
+
+        $id = Db::insert('operators', [
+            'name' => $name,
+            'slug' => $slug,
+            'prefix_patterns' => json_encode($cleanPatterns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            'sort_order' => max(0, $sortOrder),
+            'is_active' => 1,
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        self::flushCache();
+        ActivationCodePrice::flushCache();
+
+        return $id;
+    }
+
     /** @return array<int, string> */
     public static function decodePatterns(string $json): array
     {

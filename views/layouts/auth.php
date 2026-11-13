@@ -15,6 +15,25 @@
                     document.documentElement.classList.add('dark');
                 }
             } catch (e) {}
+            document.documentElement.style.colorScheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+
+            function syncIcons() {
+                var dark = document.documentElement.classList.contains('dark');
+                document.querySelectorAll('[data-theme-icon]').forEach(function (el) {
+                    el.textContent = dark ? '☀️' : '🌙';
+                });
+            }
+
+            window.toggleTheme = function () {
+                var html = document.documentElement;
+                html.classList.toggle('dark');
+                var dark = html.classList.contains('dark');
+                html.style.colorScheme = dark ? 'dark' : 'light';
+                try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+                syncIcons();
+            };
+
+            document.addEventListener('DOMContentLoaded', syncIcons);
         })();
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,7 +45,7 @@
     </script>
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
 </head>
-<body class="min-h-screen bg-slate-50 antialiased dark:bg-slate-950">
+<body class="min-h-screen bg-slate-50 text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
 <div class="grid min-h-screen lg:grid-cols-2">
     <main class="flex items-center justify-center p-5 sm:p-8">
         <div class="w-full max-w-md">

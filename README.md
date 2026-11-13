@@ -31,7 +31,7 @@
 ### پنل نماینده
 - داشبورد فروش/کمیسیون/موجودی
 - مدیریت شماره‌ها و مودم‌های اختصاصی
-- ایمپورت اکسل/CSV به‌صورت Chunked (۱۰۰ ردیف در هر درخواست) با ادامه خودکار توسط Cron
+- ایمپورت اکسل/CSV در پنل مدیریت و نماینده، به‌صورت Chunked (۱۰۰ ردیف در هر درخواست) با ادامه خودکار توسط Cron
 - گزارش فروش و تسویه با خروجی CSV
 
 ### زیرساخت
@@ -78,7 +78,7 @@ php -S 127.0.0.1:8080 -t public_html dev_router.php
 http://127.0.0.1:8080/run_migration.php?token=MIGRATION_TOKEN
 ```
 
-پس از نصب، `run_migration.php` را حذف کنید. برای داده نمونه توسعه می‌توانید `php tests/seed_dev_fixtures.php` را اجرا کنید (هرگز روی production اجرا نشود).
+پس از نصب، `run_migration.php` را حذف کنید. اگر سایت را قبلاً نصب کرده‌اید و این نسخه را جایگزین می‌کنید، `run_upgrade.php` را یک‌بار با همان `MIGRATION_TOKEN` اجرا و سپس حذف کنید. برای داده نمونه توسعه می‌توانید `php tests/seed_dev_fixtures.php` را اجرا کنید (هرگز روی production اجرا نشود).
 
 ---
 
@@ -91,7 +91,7 @@ php tests/seed_dev_fixtures.php         # داده توسعه (local فقط)
 php tests/smoke_http.php http://127.0.0.1:8080   # تست HTTP کامل
 ```
 
-تست HTTP شامل: خانه/فیلتر تاریخ تولد، سبد، Checkout، درگاه آزمایشی، Callback، Idempotency، CSRF، دسترسی سفارش، پنل ادمین/نماینده و ایمپورت CSV است.
+تست HTTP شامل: خانه/فیلتر دسته‌بندی و نوع خط، سبد، Checkout، درگاه آزمایشی، Callback، Idempotency، CSRF، دسترسی سفارش، پنل ادمین/نماینده و ایمپورت CSV است.
 
 Cron را می‌توانید دستی اجرا کنید:
 

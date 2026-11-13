@@ -3,6 +3,8 @@ $editing = $number !== null;
 $birthValue = $editing && !empty($number['birth_date']) ? jalali_date((string) $number['birth_date']) : '';
 $input = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-teal-500 dark:border-slate-700 dark:bg-slate-900';
 $label = 'block text-xs font-medium text-slate-600 dark:text-slate-300';
+$typeValue = (string) old('number_type', $number['number_type'] ?? 'round');
+$lineValue = (string) old('line_type', $number['line_type'] ?? 'prepaid');
 ?>
 <div class="mb-4 flex items-center gap-2 text-[11px] text-slate-400">
     <a href="<?= e(url('/reseller/numbers')) ?>" class="hover:text-teal-600">شماره‌های من</a><span>/</span><span><?= $editing ? 'ویرایش' : 'ثبت جدید' ?></span>
@@ -35,9 +37,27 @@ $label = 'block text-xs font-medium text-slate-600 dark:text-slate-300';
             <?php if (error('price')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('price')) ?></p><?php endif; ?>
         </div>
         <div>
+            <label for="number_type" class="<?= $label ?>">دسته‌بندی شماره *</label>
+            <select id="number_type" name="number_type" required class="<?= $input ?>">
+                <?php foreach (\App\Models\PhoneNumber::TYPES as $typeKey => $typeLabel): ?>
+                    <option value="<?= $typeKey ?>" <?= $typeValue === $typeKey ? 'selected' : '' ?>><?= e($typeLabel) ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php if (error('number_type')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('number_type')) ?></p><?php endif; ?>
+        </div>
+        <div>
+            <label for="line_type" class="<?= $label ?>">نوع خط *</label>
+            <select id="line_type" name="line_type" required class="<?= $input ?>">
+                <?php foreach (\App\Models\PhoneNumber::LINE_TYPES as $lineKey => $lineLabel): ?>
+                    <option value="<?= $lineKey ?>" <?= $lineValue === $lineKey ? 'selected' : '' ?>><?= e($lineLabel) ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php if (error('line_type')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('line_type')) ?></p><?php endif; ?>
+        </div>
+        <div>
             <label for="birth_date" class="<?= $label ?>">تاریخ تولد (شمسی، اختیاری)</label>
             <input id="birth_date" name="birth_date" value="<?= e(old('birth_date', $birthValue)) ?>" placeholder="1370/05/12" class="<?= $input ?> ltr">
-            <p class="mt-1 text-[10px] text-slate-400">در فیلتر تاریخ تولد فروشگاه قابل جستجو است.</p>
+            <p class="mt-1 text-[10px] text-slate-400">برای دسته «تاریخ تولد» الزامی است.</p>
             <?php if (error('birth_date')): ?><p class="mt-1 text-[11px] text-rose-600"><?= e(error('birth_date')) ?></p><?php endif; ?>
         </div>
         <div class="sm:col-span-2">

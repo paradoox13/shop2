@@ -1,4 +1,4 @@
-<?php $input = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-center text-xl tracking-[0.4em] outline-none focus:border-teal-500 dark:border-slate-700 dark:bg-slate-900'; ?>
+<?php $input = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-center text-xl tracking-[0.4em] text-slate-900 outline-none focus:border-teal-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100'; ?>
 <div class="rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
     <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-2xl dark:bg-teal-950" aria-hidden="true">🔐</span>
     <h1 class="mt-3 text-lg font-extrabold">تأیید دو مرحله‌ای</h1>

@@ -13,18 +13,18 @@
     }
 
     window.toggleTheme = function () {
+        var html = document.documentElement;
+        html.classList.toggle('dark');
+        var dark = html.classList.contains('dark');
+        html.style.colorScheme = dark ? 'dark' : 'light';
+
         try {
-            if (isDark()) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
-            syncThemeButtons();
+            localStorage.setItem('theme', dark ? 'dark' : 'light');
         } catch (e) {
             // localStorage ممکن است در حالت خصوصی در دسترس نباشد
         }
+
+        syncThemeButtons();
     };
 
     window.copyText = function (text, button) {
@@ -48,6 +48,7 @@
     };
 
     document.addEventListener('DOMContentLoaded', function () {
+        document.documentElement.style.colorScheme = isDark() ? 'dark' : 'light';
         syncThemeButtons();
 
         document.querySelectorAll('.js-auto-hide').forEach(function (el) {

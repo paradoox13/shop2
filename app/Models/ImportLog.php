@@ -11,7 +11,7 @@ final class ImportLog
     /**
      * @param array<int, string> $headers
      */
-    public static function create(int $resellerId, string $type, string $filePath, array $headers, int $totalRows): int
+    public static function create(?int $resellerId, string $type, string $filePath, array $headers, int $totalRows): int
     {
         return Db::insert('import_logs', [
             'reseller_id' => $resellerId,
@@ -71,6 +71,30 @@ final class ImportLog
             'error_log' => mb_substr($errorLog, 0, 60000),
             'updated_at' => date('Y-m-d H:i:s'),
         ], 'id = ?', [$id]);
+    }
+
+    /**
+     * تاریخچه کامل برای مدیر؛ ردیف‌های ایمپورت مدیر نام نماینده ندارند.
+     * @return array{items:array<int,array<string,mixed>>, total:int, page:int, pages:int, per_page:int}
+     */
+    public static function forAdmin(int $page = 1, int $perPage = 15): array
+    {
+        $page = max(1, $page);
+        $perPage = max(1, min(50, $perPage));
+        $total = (int) Db::scalar('SELECT COUNT(*) FROM import_logs', [], 0);
+        $pages = max(1, (int) ceil($total / $perPage));
+        $page = min($page, $pages);
+        $offset = ($page - 1) * $perPage;
+
+        $items = Db::all(
+            "SELECT il.*, COALESCE(rp.display_name, u.username) AS reseller_name
+             FROM import_logs il
+             LEFT JOIN users u ON u.id = il.reseller_id
+             LEFT JOIN reseller_profiles rp ON rp.user_id = il.reseller_id
+             ORDER BY il.id DESC LIMIT " . $perPage . ' OFFSET ' . $offset
+        );
+
+        return ['items' => $items, 'total' => $total, 'page' => $page, 'pages' => $pages, 'per_page' => $perPage];
     }
 
     /**

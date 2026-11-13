@@ -12,8 +12,8 @@ use App\Models\Modem;
 use App\Models\Operator;
 use App\Models\PhoneNumber;
 use App\Support\Mailer;
+use App\Models\Setting;
 use App\Support\RateLimiter;
-use App\Support\Setting;
 use App\Support\Validator;
 
 final class HomeController extends Controller
@@ -46,7 +46,11 @@ final class HomeController extends Controller
 
     public function about(): string
     {
-        return $this->staticPage('about', 'about_title', 'درباره ما');
+        $fallback = '<p>آوال سیم یک وب‌سایت فعال و معتبر در زمینه فروش انواع سیم‌کارت اعتباری و دائمی در اپراتورهای مختلف و همچنین فروش انواع مودم و کارتخوان با قیمت مناسب و کیفیت بالا بوده که همواره توانسته رضایت مشتریان خود را داشته باشد.</p>'
+            . '<p>در آوال سیم می‌توانید شماره‌های رند، خانوادگی، فوق رند، سریالی و شماره‌های دارای تاریخ تولد را در اپراتورهای همراه اول، ایرانسل و رایتل بررسی و خریداری کنید. تمام شماره‌ها پیش از انتشار بررسی می‌شوند و وضعیت آن‌ها در لحظه به‌روزرسانی می‌شود.</p>'
+            . '<p>هدف ما ارائه قیمت شفاف، تحویل سریع و پشتیبانی واقعی است. برای خرید عمده یا همکاری به‌عنوان نماینده با ما تماس بگیرید.</p>';
+
+        return $this->staticPage('about', 'about_title', 'درباره ما', $fallback);
     }
 
     public function terms(): string
@@ -128,13 +132,13 @@ final class HomeController extends Controller
         return '';
     }
 
-    private function staticPage(string $slug, string $titleKey, string $defaultTitle): string
+    private function staticPage(string $slug, string $titleKey, string $defaultTitle, string $fallback = ''): string
     {
         return $this->view('pages/static', [
             'title' => setting($titleKey, $defaultTitle) . ' | ' . setting('site_name'),
             'metaDescription' => setting('site_description'),
             'pageTitle' => setting($titleKey, $defaultTitle),
-            'pageContent' => Setting::get('page_' . $slug),
+            'pageContent' => Setting::get('page_' . $slug, $fallback),
         ], 'main');
     }
 }
